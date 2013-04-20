@@ -1,0 +1,21 @@
+{
+    "friendlyVersion": "dev_0.0",
+    "versionDefName": "APP_RESOURCES",
+
+    "media": [{
+        "type": "png-trans",
+        "defName": "IMAGE_HOUR",
+        "file": "images/hour_hand.png"
+    },
+    {
+        "type": "png-trans",
+        "defName": "IMAGE_MINUTE",
+        "file": "images/minute_hand.png"
+    },
+    {
+      "type":"png",
+      "defName":"IMAGE_MENU_ICON",
+      "file":"images/plain_logo.png"
+     }
+    ]
+}
