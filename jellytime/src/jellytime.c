@@ -48,8 +48,6 @@ static const char* const MONTHS[] = {
 
 void draw_date(PblTm* t) {
   char day[] = "14";
-
-  string_format_time(minute_text, sizeof(hour_text), "%M", t);
   string_format_time(day, sizeof(day), "%d", t);
   
   size_t size = sizeof(date_text);
@@ -83,6 +81,7 @@ void set_time(PblTm* t) {
     	memmove(hour_text, &hour_text[1], sizeof(hour_text) - 1);
     }
   // section ends
+  string_format_time(minute_text, sizeof(hour_text), "%M", t);
 
   if(t->tm_min==0&&t->tm_hour==0){
      draw_date(t);
