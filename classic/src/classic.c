@@ -168,7 +168,7 @@ void draw_date(){
 void handle_init(AppContextRef ctx) {
   (void)ctx;
 
-  window_init(&window, "Modern Watch");
+  window_init(&window, "Classic Watch");
   window_stack_push(&window, true /* Animated */);
 
   resource_init_current_app(&APP_RESOURCES);
