@@ -1,0 +1,21 @@
+
+{"friendlyVersion": "VERSION",
+ "versionDefName": "APP_RESOURCES",
+ "media": [
+    {
+      "type":"png",
+      "defName":"IMAGE_BACKGROUND",
+      "file":"images/maurice_background3.png"
+    },
+    {
+      "type":"png",
+      "defName":"IMAGE_MENU_ICON",
+      "file":"images/maurice_logo.png"
+    },
+    {
+       "type": "font",
+       "defName": "FONT_RADIOLAND_15",
+       "file": "fonts/RADIOLAND.ttf"
+    }
+    ]
+}
