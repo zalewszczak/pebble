@@ -1,0 +1,22 @@
+{
+    "friendlyVersion": "dev_0.0",
+    "versionDefName": "APP_RESOURCES",
+
+    "media": [
+    {
+      "type":"png",
+      "defName":"IMAGE_BACKGROUND",
+      "file":"images/boss_background4.png"
+    },
+    {
+      "type":"png",
+      "defName":"IMAGE_MENU_ICON",
+      "file":"images/boss_logo.png"
+    },
+    {
+       "type": "font",
+       "defName": "FONT_JOSEFINSLAB_BOLDITALIC_15",
+       "file": "fonts/JosefinSlab-BoldItalic.ttf"
+    }
+    ]
+}
