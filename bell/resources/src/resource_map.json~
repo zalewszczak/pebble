@@ -1,0 +1,16 @@
+
+{"friendlyVersion": "VERSION",
+ "versionDefName": "VERSION",
+ "media": [
+	   {
+      "type":"png",
+      "defName":"IMAGE_BACKGROUND",
+      "file":"images/bell_background.png"
+    },
+    {
+      "type":"png",
+      "defName":"IMAGE_MENU_ICON",
+      "file":"images/bell_logo.png"
+    }
+	  ]
+}
