@@ -1,0 +1,26 @@
+
+{"friendlyVersion": "VERSION",
+ "versionDefName": "APP_RESOURCES",
+ "media": [
+       {
+       "type": "font",
+       "defName": "FONT_ROBOTO_THIN_40",
+       "file": "fonts/Roboto-Thin.ttf"
+       },
+       {
+       "type": "font",
+       "defName": "FONT_ROBOTO_REGULAR_12",
+       "file": "fonts/Roboto-Regular.ttf"
+       },
+       {
+       "type": "font",
+       "defName": "FONT_ROBOTO_BOLD_40",
+       "file": "fonts/Roboto-Bold.ttf"
+       },
+     {
+      "type":"png",
+      "defName":"IMAGE_MENU_ICON",
+      "file":"images/jellytime_logo.png"
+     }
+  ]
+}
