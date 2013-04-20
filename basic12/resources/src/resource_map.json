@@ -1,0 +1,36 @@
+
+{"friendlyVersion": "VERSION",
+ "versionDefName": "APP_RESOURCES",
+ "media": [
+       {
+      "type":"png",
+      "defName":"IMAGE_BACKGROUND",
+       "file":"images/basic12_background.png"
+       },
+       {
+       "type": "font",
+       "defName": "FONT_ROBOTO_REGULAR_16",
+       "file": "fonts/Roboto-Regular.ttf"
+       },
+       {
+       "type": "font",
+       "defName": "FONT_ROBOTO_CONDENSED_49",
+       "file": "fonts/Roboto-Condensed.ttf"
+       },
+       {
+       "type": "font",
+       "defName": "FONT_ROBOTO_CONDENSED_20",
+       "file": "fonts/Roboto-Condensed.ttf"
+       },
+       {
+       "type": "font",
+       "defName": "FONT_ROBOTO_REGULAR_21",
+       "file": "fonts/Roboto-Regular.ttf"
+       },
+     {
+      "type":"png",
+      "defName":"IMAGE_MENU_ICON",
+      "file":"images/basic12_logo.png"
+     }
+  ]
+}
