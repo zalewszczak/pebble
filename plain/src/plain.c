@@ -5,7 +5,7 @@
 
 #define MY_UUID { 0x99, 0xC8, 0x9A, 0x5D, 0xCD, 0x10, 0x40, 0xD3, 0x88, 0x24, 0x50, 0xBE, 0xFD, 0x03, 0xB3, 0xF6 }
 PBL_APP_INFO(MY_UUID,
-             "Modern", "Zalew",
+             "Plain", "Zalew",
              2, 0, /* App version */
              RESOURCE_ID_IMAGE_MENU_ICON,
              APP_INFO_WATCH_FACE);
