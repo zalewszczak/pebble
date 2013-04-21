@@ -140,8 +140,8 @@ void time_display_layer_update_callback(Layer *me, GContext* ctx) {
 
   get_time(&t);
 
-  unsigned int hour_angle = t.tm_hour * 30;
-  unsigned int minute_angle = t.tm_min * 6 + t.tm_min / 2;
+  unsigned int hour_angle = t.tm_hour * 30 + t.tm_min / 2;
+  unsigned int minute_angle = t.tm_min * 6;
   gpath_rotate_to(&hour_hand_path, (TRIG_MAX_ANGLE / 360) * hour_angle);
   gpath_rotate_to(&minute_hand_path, (TRIG_MAX_ANGLE / 360) * minute_angle);
   
