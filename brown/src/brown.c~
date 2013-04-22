@@ -15,7 +15,7 @@ PBL_APP_INFO(MY_UUID,
 #define DISPLAY_DATE_LONG true
 #define SMOOTH_MINUTE false
 #define HOUR_VIBRATION true
-#define HOUR_VIBRATION_START 8
+#define HOUR_VIBRATION_START 6
 #define HOUR_VIBRATION_END 20
 
 Window window;
@@ -285,7 +285,7 @@ void handle_tick(AppContextRef ctx, PebbleTickEvent *t){
            }
 #endif
         }
-    }
+     }
   }
 
 #if DISPLAY_SECONDS

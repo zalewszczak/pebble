@@ -9,6 +9,11 @@
     },
     {
       "type":"png",
+      "defName":"IMAGE_BACKGROUND_LOGO",
+      "file":"images/maurice_background4.png"
+    },
+    {
+      "type":"png",
       "defName":"IMAGE_MENU_ICON",
       "file":"images/maurice_logo.png"
     },

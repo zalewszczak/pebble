@@ -6,9 +6,16 @@
 #define MY_UUID { 0x18, 0x49, 0x4A, 0x8C, 0x43, 0x61, 0x4B, 0x38, 0x8D, 0xC0, 0x08, 0x64, 0x9C, 0x64, 0x67, 0xE5 }
 PBL_APP_INFO(MY_UUID,
              "Maurice", "Zalew",
-             2, 0, /* App version */
+             2, 1, /* App version */
              RESOURCE_ID_IMAGE_MENU_ICON,
              APP_INFO_WATCH_FACE);
+
+#define DISPLAY_SECONDS true
+#define DISPLAY_LOGO true
+#define DISPLAY_DATE true
+#define HOUR_VIBRATION false
+#define HOUR_VIBRATION_START 8
+#define HOUR_VIBRATION_END 20
 
 Window window;
 BmpContainer background_image_container;
@@ -16,10 +23,16 @@ BmpContainer background_image_container;
 Layer minute_display_layer;
 Layer hour_display_layer;
 Layer center_display_layer;
-Layer second_display_layer;
-TextLayer date_layer;
 
+#if DISPLAY_LOGO
+Layer second_display_layer;
+#endif
+
+#if DISPLAY_DATE
+TextLayer date_layer;
+GFont date_font;
 static char date_text[] = "WED 13";
+#endif
 
 const GPathInfo MINUTE_HAND_PATH_POINTS = {
   4,
@@ -66,6 +79,7 @@ GPath hour_hand_outline_path;
 GPath minute_hand_path;
 GPath minute_hand_outline_path;
 
+#if DISPLAY_SECONDS
 void second_display_layer_update_callback(Layer *me, GContext* ctx) {
   (void)me;
 
@@ -83,6 +97,7 @@ void second_display_layer_update_callback(Layer *me, GContext* ctx) {
 
   graphics_draw_line(ctx, center, second);
 }
+#endif
 
 void center_display_layer_update_callback(Layer *me, GContext* ctx) {
   (void)me;
@@ -128,6 +143,7 @@ void hour_display_layer_update_callback(Layer *me, GContext* ctx) {
   gpath_draw_filled(ctx, &hour_hand_path);
 }
 
+#if DISPLAY_DATE
 void draw_date(){
   PblTm t;
   get_time(&t);
@@ -135,29 +151,32 @@ void draw_date(){
   string_format_time(date_text, sizeof(date_text), "%a %d", &t);
   text_layer_set_text(&date_layer, date_text);
 }
+#endif
 
 void handle_init(AppContextRef ctx) {
   (void)ctx;
 
   window_init(&window, "Maurice Watch");
   window_stack_push(&window, true /* Animated */);
-  //window_set_background_color(&window, GColorBlack);
 
   resource_init_current_app(&APP_RESOURCES);
+#if DISPLAY_LOGO
+  bmp_init_container(RESOURCE_ID_IMAGE_BACKGROUND_LOGO, &background_image_container);
+#else
   bmp_init_container(RESOURCE_ID_IMAGE_BACKGROUND, &background_image_container);
+#endif
   layer_add_child(&window.layer, &background_image_container.layer.layer);
-
-  //GFont orbitron = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_ORBITRON_MEDIUM_12));
-  GFont digital = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_RADIOLAND_15));
-  //text_layer_init(&date_layer, GRect(116, 77, 20, 20));
+#if DISPLAY_DATE
+  date_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_RADIOLAND_15));
   text_layer_init(&date_layer, GRect(27, 110, 90, 30));
   text_layer_set_text_alignment(&date_layer, GTextAlignmentCenter);
   text_layer_set_text_color(&date_layer, GColorWhite);
   text_layer_set_background_color(&date_layer, GColorClear);
-  text_layer_set_font(&date_layer, digital);
+  text_layer_set_font(&date_layer, date_font);
   layer_add_child(&window.layer, &date_layer.layer);
 
   draw_date();
+#endif
 
   layer_init(&hour_display_layer, window.layer.frame);
   hour_display_layer.update_proc = &hour_display_layer_update_callback;
@@ -181,21 +200,26 @@ void handle_init(AppContextRef ctx) {
   center_display_layer.update_proc = &center_display_layer_update_callback;
   layer_add_child(&window.layer, &center_display_layer);
 
+#if DISPLAY_SECONDS
   layer_init(&second_display_layer, window.layer.frame);
   second_display_layer.update_proc = &second_display_layer_update_callback;
   layer_add_child(&window.layer, &second_display_layer);
+#endif
 }
 
 void handle_deinit(AppContextRef ctx) {
   (void)ctx;
 
   bmp_deinit_container(&background_image_container);
+#if DISPLAY_DATE
+  fonts_unload_custom_font(date_font);
+#endif
 }
 
 void handle_second_tick(AppContextRef ctx, PebbleTickEvent *t){
   (void)t;
   (void)ctx;
-
+/*
   if(t->tick_time->tm_sec!=0)
   {
      if(t->tick_time->tm_sec%10==0)
@@ -220,6 +244,38 @@ void handle_second_tick(AppContextRef ctx, PebbleTickEvent *t){
      layer_mark_dirty(&minute_display_layer);
      draw_date();
   }
+*/
+
+  if(t->tick_time->tm_sec%10==0)
+  {
+     layer_mark_dirty(&minute_display_layer);
+     
+     if(t->tick_time->tm_sec==0)
+     {
+        if(t->tick_time->tm_min%2==0)
+        {
+           layer_mark_dirty(&hour_display_layer);
+#if DISPLAY_DATE
+           if(t->tick_time->tm_min==0&&t->tick_time->tm_hour==0)
+           {
+              draw_date();
+           }
+#endif
+#if HOUR_VIBRATION
+           if(t->tick_time->tm_min==0
+                 &&t->tick_time->tm_hour>=HOUR_VIBRATION_START
+                    &&t->tick_time->tm_hour<=HOUR_VIBRATION_END)
+           {
+              vibes_double_pulse();
+           }
+#endif
+        }
+     }
+  }
+
+#if DISPLAY_SECONDS
+  layer_mark_dirty(&second_display_layer);
+#endif
 }
 
 void pbl_main(void *params) {
@@ -228,7 +284,11 @@ void pbl_main(void *params) {
     .deinit_handler = &handle_deinit,
     .tick_info = {
 			.tick_handler = &handle_second_tick,
+#if DISPLAY_SECONDS
 			.tick_units = SECOND_UNIT
+#else 
+			.tick_units = MINUTE_UNIT
+#endif
 		}
   };
   app_event_loop(params, &handlers);
