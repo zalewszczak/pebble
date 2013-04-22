@@ -9,6 +9,11 @@
         "file": "images/classic_background.png"
     },
     {
+        "type": "png",
+        "defName": "IMAGE_BACKGROUND_LOGO",
+        "file": "images/classic_background2.png"
+    },
+    {
        "type": "font",
        "defName": "FONT_ROBOTO_THIN_11",
        "file": "fonts/Roboto-Regular.ttf"
