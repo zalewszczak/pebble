@@ -6,14 +6,14 @@
 #define MY_UUID { 0x7D, 0xBE, 0x9F, 0x98, 0xED, 0x6D, 0x45, 0xC7, 0x82, 0x4F, 0xED, 0x22, 0x26, 0x48, 0x61, 0xA7 }
 PBL_APP_INFO(MY_UUID,
              "Boss", "Zalew",
-             2, 0, /* App version */
+             2, 1, /* App version */
              RESOURCE_ID_IMAGE_MENU_ICON,
              APP_INFO_WATCH_FACE);
 
-#define DISPLAY_SECONDS false
-#define DISPLAY_FILLED_HANDS true
+#define DISPLAY_SECONDS true
+#define DISPLAY_FILLED_HANDS false
 #define DISPLAY_DATE true
-#define DISPLAY_LOGO false
+#define DISPLAY_LOGO true
 
 Window window;
 BmpContainer background_image_container;
@@ -221,11 +221,13 @@ void handle_init(AppContextRef ctx) {
 #endif
 }
 
-void handle_second_tick(AppContextRef ctx, PebbleTickEvent *t){
+void handle_tick(AppContextRef ctx, PebbleTickEvent *t){
   (void)t;
   (void)ctx;
-
-  layer_mark_dirty(&time_display_layer);
+  if(t->tick_time->tm_sec==0)
+  {
+      layer_mark_dirty(&time_display_layer);
+  }
 
 #if DISPLAY_SECONDS
   layer_mark_dirty(&second_display_layer);
@@ -252,8 +254,12 @@ void pbl_main(void *params) {
     .init_handler = &handle_init,
     .deinit_handler = &handle_deinit,
     .tick_info = {
-			.tick_handler = &handle_second_tick,
+			.tick_handler = &handle_tick,
+#if DISPLAY_SECONDS
 			.tick_units = SECOND_UNIT
+#else
+			.tick_units = MINUTE_UNIT
+#endif
 		}
   };
   app_event_loop(params, &handlers);
