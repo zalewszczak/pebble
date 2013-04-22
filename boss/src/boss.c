@@ -10,15 +10,24 @@ PBL_APP_INFO(MY_UUID,
              RESOURCE_ID_IMAGE_MENU_ICON,
              APP_INFO_WATCH_FACE);
 
+#define DISPLAY_SECONDS false
+#define DISPLAY_FILLED_HANDS true
+#define DISPLAY_DATE true
+#define DISPLAY_LOGO false
+
 Window window;
 BmpContainer background_image_container;
-
+#if DISPLAY_SECONDS
 Layer second_display_layer;
+#endif
 Layer time_display_layer;
+#if DISPLAY_DATE
 TextLayer date_layer;
-
+GFont date_font;
 static char date_text[] = "12";
+#endif
 
+#if DISPLAY_FILLED_HANDS
 const GPathInfo HOUR_HAND_PATH_POINTS = {
   4,
   (GPoint []) {
@@ -41,7 +50,9 @@ const GPathInfo MINUTE_HAND_PATH_POINTS = {
 
 GPath hour_hand_path;
 GPath minute_hand_path;
+#endif
 
+#if DISPLAY_SECONDS
 void second_display_layer_update_callback(Layer *me, GContext* ctx) {
   (void)me;
 
@@ -59,10 +70,26 @@ void second_display_layer_update_callback(Layer *me, GContext* ctx) {
 
   graphics_draw_line(ctx, center, second);
 }
+#endif
 
 void time_display_layer_update_callback(Layer *me, GContext* ctx) {
   (void)me;
-/* Old hands drawing section, new below based on Segment Six watchface - allows to draw filled shapes
+#if DISPLAY_FILLED_HANDS
+  PblTm t;
+  get_time(&t);
+
+  unsigned int hour_angle = t.tm_hour * 30 + t.tm_min / 2;
+  unsigned int minute_angle = t.tm_min * 6;
+  gpath_rotate_to(&hour_hand_path, (TRIG_MAX_ANGLE / 360) * hour_angle);
+  gpath_rotate_to(&minute_hand_path, (TRIG_MAX_ANGLE / 360) * minute_angle);
+  
+  graphics_context_set_fill_color(ctx, GColorWhite);
+  gpath_draw_filled(ctx, &hour_hand_path);
+  gpath_draw_filled(ctx, &minute_hand_path);
+  gpath_draw_outline(ctx, &hour_hand_path);
+  gpath_draw_outline(ctx, &minute_hand_path);
+#else
+  //Old hands drawing section, new above based on Segment Six watchface - allows to draw filled shapes
   PblTm t;
   get_time(&t);
 
@@ -134,24 +161,10 @@ void time_display_layer_update_callback(Layer *me, GContext* ctx) {
   graphics_draw_line(ctx, minute_offset1, minute);
   graphics_draw_line(ctx, minute, minute_offset2);
   graphics_draw_line(ctx, minute_offset2, center);
-*/
-
-  PblTm t;
-
-  get_time(&t);
-
-  unsigned int hour_angle = t.tm_hour * 30 + t.tm_min / 2;
-  unsigned int minute_angle = t.tm_min * 6;
-  gpath_rotate_to(&hour_hand_path, (TRIG_MAX_ANGLE / 360) * hour_angle);
-  gpath_rotate_to(&minute_hand_path, (TRIG_MAX_ANGLE / 360) * minute_angle);
-  
-  graphics_context_set_fill_color(ctx, GColorWhite);
-  gpath_draw_filled(ctx, &hour_hand_path);
-  gpath_draw_filled(ctx, &minute_hand_path);
-  gpath_draw_outline(ctx, &hour_hand_path);
-  gpath_draw_outline(ctx, &minute_hand_path);
+#endif
 }
 
+#if DISPLAY_DATE
 void draw_date(){
   PblTm t;
   get_time(&t);
@@ -159,66 +172,79 @@ void draw_date(){
   string_format_time(date_text, sizeof(date_text), "%d", &t);
   text_layer_set_text(&date_layer, date_text);
 }
+#endif
 
 void handle_init(AppContextRef ctx) {
   (void)ctx;
 
   window_init(&window, "Boss");
   window_stack_push(&window, true /* Animated */);
-  window_set_background_color(&window, GColorBlack);
 
   resource_init_current_app(&APP_RESOURCES);
+#if DISPLAY_DATE && DISPLAY_LOGO
+  bmp_init_container(RESOURCE_ID_IMAGE_BACKGROUND_DATE_LOGO, &background_image_container);
+#elif DISPLAY_DATE
+  bmp_init_container(RESOURCE_ID_IMAGE_BACKGROUND_DATE, &background_image_container);
+#elif DISPLAY_LOGO
+  bmp_init_container(RESOURCE_ID_IMAGE_BACKGROUND_LOGO, &background_image_container);
+#else
   bmp_init_container(RESOURCE_ID_IMAGE_BACKGROUND, &background_image_container);
+#endif
   layer_add_child(&window.layer, &background_image_container.layer.layer);
 
-  GFont josefin = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_JOSEFINSLAB_BOLDITALIC_15));
+#if DISPLAY_DATE
+  GFont date_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_JOSEFINSLAB_BOLDITALIC_15));
   text_layer_init(&date_layer, GRect(60, 120, 22, 19));
   text_layer_set_text_alignment(&date_layer, GTextAlignmentCenter);
   text_layer_set_text_color(&date_layer, GColorBlack);
   text_layer_set_background_color(&date_layer, GColorClear);
-  text_layer_set_font(&date_layer, josefin);
+  text_layer_set_font(&date_layer, date_font);
   layer_add_child(&window.layer, &date_layer.layer);
 
   draw_date();
+#endif
 
   layer_init(&time_display_layer, window.layer.frame);
   time_display_layer.update_proc = &time_display_layer_update_callback;
   layer_add_child(&window.layer, &time_display_layer);
-
+#if DISPLAY_FILLED_HANDS
   gpath_init(&minute_hand_path, &MINUTE_HAND_PATH_POINTS);
   gpath_move_to(&minute_hand_path, grect_center_point(&time_display_layer.frame));
   gpath_init(&hour_hand_path, &HOUR_HAND_PATH_POINTS);
   gpath_move_to(&hour_hand_path, grect_center_point(&time_display_layer.frame));
+#endif
 
+#if DISPLAY_SECONDS
   layer_init(&second_display_layer, window.layer.frame);
   second_display_layer.update_proc = &second_display_layer_update_callback;
   layer_add_child(&window.layer, &second_display_layer);
+#endif
 }
 
 void handle_second_tick(AppContextRef ctx, PebbleTickEvent *t){
   (void)t;
   (void)ctx;
 
-  if(t->tick_time->tm_sec!=0)
+  layer_mark_dirty(&time_display_layer);
+
+#if DISPLAY_SECONDS
+  layer_mark_dirty(&second_display_layer);
+#endif
+#if DISPLAY_DATE
+  if(t->tick_time->tm_min==0&&t->tick_time->tm_hour==0)
   {
-     layer_mark_dirty(&second_display_layer);
-  }
-  else if(t->tick_time->tm_min!=0&&t->tick_time->tm_hour!=0)
-  {
-     layer_mark_dirty(&second_display_layer);
-     layer_mark_dirty(&time_display_layer);
-  }else
-  {
-     layer_mark_dirty(&second_display_layer);
-     layer_mark_dirty(&time_display_layer);
      draw_date();
   }
+#endif
 }
 
 void handle_deinit(AppContextRef ctx) {
   (void)ctx;
 
   bmp_deinit_container(&background_image_container);
+#if DISPLAY_DATE
+  fonts_unload_custom_font(date_font);
+#endif
 }
 
 void pbl_main(void *params) {

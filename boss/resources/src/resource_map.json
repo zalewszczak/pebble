@@ -6,6 +6,21 @@
     {
       "type":"png",
       "defName":"IMAGE_BACKGROUND",
+      "file":"images/boss_background.png"
+    },
+    {
+      "type":"png",
+      "defName":"IMAGE_BACKGROUND_LOGO",
+      "file":"images/boss_background2.png"
+    },
+    {
+      "type":"png",
+      "defName":"IMAGE_BACKGROUND_DATE",
+      "file":"images/boss_background3.png"
+    },
+    {
+      "type":"png",
+      "defName":"IMAGE_BACKGROUND_DATE_LOGO",
       "file":"images/boss_background4.png"
     },
     {
