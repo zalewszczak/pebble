@@ -19,7 +19,7 @@ DISPLAY_LOGO - draws logo at the bottom
 */
 #define DISPLAY_SECONDS true
 #define DISPLAY_DATE_ANALOG false
-#define DISPLAY_DATE_DIGITAL true
+#define DISPLAY_DATE_DIGITAL false
 #define DISPLAY_DATE_DIGITAL_DAY false
 #define DISPLAY_LOGO true
 
@@ -30,9 +30,11 @@ Layer minute_display_layer;
 Layer hour_display_layer;
 Layer center_display_layer;
 Layer second_display_layer;
+#if DISPLAY_DATE_ANALOG || DISPLAY_DATE_DIGITAL || DISPLAY_DATE_DIGITAL_DAY
 TextLayer date_layer;
-
+GFont date_font;
 static char date_text[] = "12-04-13";
+#endif
 
 const GPathInfo MINUTE_HAND_PATH_POINTS = {
   4,
@@ -78,10 +80,6 @@ GPath hour_hand_path;
 GPath hour_hand_outline_path;
 GPath minute_hand_path;
 GPath minute_hand_outline_path;
-
-#if DISPLAY_DATE_DIGITAL || DISPLAY_DATE_DIGITAL_DAY || DISPLAY_DATE_ANALOG
-GFont date_font;
-#endif
 
 #if DISPLAY_SECONDS
 void second_display_layer_update_callback(Layer *me, GContext* ctx) {
