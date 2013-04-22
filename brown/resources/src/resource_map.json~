@@ -14,7 +14,7 @@
     },
     {
        "type": "font",
-       "defName": "FONT_OPENSANS_REGULAR_15",
+       "defName": "FONT_OPENSANS_REGULAR_14",
        "file": "fonts/OpenSans-Regular.ttf"
     }
     ]

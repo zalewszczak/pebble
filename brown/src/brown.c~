@@ -11,9 +11,8 @@ PBL_APP_INFO(MY_UUID,
              APP_INFO_WATCH_FACE);
 
 #define DISPLAY_SECONDS true
-#define DISPLAY_DATE_SHORT false
-#define DISPLAY_DATE_LONG true
-#define SMOOTH_MINUTE false
+#define DISPLAY_DATE_SHORT true
+#define DISPLAY_DATE_LONG false
 #define HOUR_VIBRATION true
 #define HOUR_VIBRATION_START 6
 #define HOUR_VIBRATION_END 20
@@ -180,8 +179,14 @@ void handle_init(AppContextRef ctx) {
   window_stack_push(&window, true /* Animated */);
 
   resource_init_current_app(&APP_RESOURCES);
+#if DISPLAY_DATE_SHORT
+  bmp_init_container(RESOURCE_ID_IMAGE_BACKGROUND_BOX, &background_image_container);
+#else
   bmp_init_container(RESOURCE_ID_IMAGE_BACKGROUND, &background_image_container);
+#endif
   layer_add_child(&window.layer, &background_image_container.layer.layer);
+
+
 #if DISPLAY_DATE_SHORT || DISPLAY_DATE_LONG
   date_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_OPENSANS_REGULAR_14));
   text_layer_init(&date_layer, GRect(27, 110, 90, 30));
@@ -257,11 +262,7 @@ void handle_tick(AppContextRef ctx, PebbleTickEvent *t){
 */
 
 
-#if SMOOTH_MINUTE
   if(t->tick_time->tm_sec%10==0)
-#else
-  if(t->tick_time->tm_sec==0)
-#endif
   {
      layer_mark_dirty(&minute_display_layer);
      
@@ -299,7 +300,7 @@ void pbl_main(void *params) {
     .deinit_handler = &handle_deinit,
     .tick_info = {
 			.tick_handler = &handle_tick,
-#if DISPLAY_SECONDS || SMOOTH_MINUTE
+#if DISPLAY_SECONDS
 			.tick_units = SECOND_UNIT
 #else
 			.tick_units = MINUTE_UNIT
