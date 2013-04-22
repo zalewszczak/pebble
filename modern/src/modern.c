@@ -9,6 +9,19 @@ PBL_APP_INFO(MY_UUID,
              2, 0, /* App version */
              RESOURCE_ID_IMAGE_MENU_ICON,
              APP_INFO_WATCH_FACE);
+/*preprocessor conditions:
+DISPLAY_SECONDS - draws seconds hand
+DISPLAY_DATE_* - draws date PICK ONLY ONE
+            +ANALOG - box in place of number 3 with number
+            +DIGITAL - text with month and day on top
+            +DIGITAL_DAY - text with day and month on top
+DISPLAY_LOGO - draws logo at the bottom
+*/
+#define DISPLAY_SECONDS true
+#define DISPLAY_DATE_ANALOG false
+#define DISPLAY_DATE_DIGITAL true
+#define DISPLAY_DATE_DIGITAL_DAY false
+#define DISPLAY_LOGO true
 
 Window window;
 BmpContainer background_image_container;
@@ -66,6 +79,11 @@ GPath hour_hand_outline_path;
 GPath minute_hand_path;
 GPath minute_hand_outline_path;
 
+#if DISPLAY_DATE_DIGITAL || DISPLAY_DATE_DIGITAL_DAY || DISPLAY_DATE_ANALOG
+GFont date_font;
+#endif
+
+#if DISPLAY_SECONDS
 void second_display_layer_update_callback(Layer *me, GContext* ctx) {
   (void)me;
 
@@ -83,7 +101,7 @@ void second_display_layer_update_callback(Layer *me, GContext* ctx) {
 
   graphics_draw_line(ctx, center, second);
 }
-
+#endif
 void center_display_layer_update_callback(Layer *me, GContext* ctx) {
   (void)me;
 
@@ -127,7 +145,15 @@ void hour_display_layer_update_callback(Layer *me, GContext* ctx) {
   graphics_context_set_fill_color(ctx, GColorWhite);
   gpath_draw_filled(ctx, &hour_hand_path);
 }
-
+#if DISPLAY_DATE_ANALOG
+void draw_date(){
+  PblTm t;
+  get_time(&t);
+  
+  string_format_time(date_text, sizeof(date_text), "%d", &t);
+  text_layer_set_text(&date_layer, date_text);
+}
+#elif DISPLAY_DATE_DIGITAL
 void draw_date(){
   PblTm t;
   get_time(&t);
@@ -135,30 +161,51 @@ void draw_date(){
   string_format_time(date_text, sizeof(date_text), "%d-%m", &t);
   text_layer_set_text(&date_layer, date_text);
 }
+#elif DISPLAY_DATE_DIGITAL_DAY
+void draw_date(){
+  PblTm t;
+  get_time(&t);
+  
+  string_format_time(date_text, sizeof(date_text), "%a %d", &t);
+  text_layer_set_text(&date_layer, date_text);
+}
+#endif
 
 void handle_init(AppContextRef ctx) {
   (void)ctx;
 
   window_init(&window, "Modern Watch");
   window_stack_push(&window, true /* Animated */);
-  //window_set_background_color(&window, GColorBlack);
-
   resource_init_current_app(&APP_RESOURCES);
+
+#if DISPLAY_LOGO && DISPLAY_DATE_ANALOG
+  bmp_init_container(RESOURCE_ID_IMAGE_BACKGROUND_LOGO_DATEBOX, &background_image_container);
+#elif DISPLAY_LOGO
+  bmp_init_container(RESOURCE_ID_IMAGE_BACKGROUND_LOGO, &background_image_container);
+#elif DISPLAY_DATE_ANALOG
+  bmp_init_container(RESOURCE_ID_IMAGE_BACKGROUND_DATEBOX, &background_image_container);
+#else
   bmp_init_container(RESOURCE_ID_IMAGE_BACKGROUND, &background_image_container);
+#endif
   layer_add_child(&window.layer, &background_image_container.layer.layer);
 
-  //GFont orbitron = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_ORBITRON_MEDIUM_12));
-  GFont digital = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_DIGITALDREAM_NARROW_12));
-  //text_layer_init(&date_layer, GRect(116, 77, 20, 20));
+#if DISPLAY_DATE_ANALOG
+  date_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_ORBITRON_MEDIUM_12));
+  text_layer_init(&date_layer, GRect(116, 77, 20, 20));
+  text_layer_set_text_color(&date_layer, GColorBlack);
+#elif DISPLAY_DATE_DIGITAL || DISPLAY_DATE_DIGITAL_DAY
+  date_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_DIGITALDREAM_NARROW_12));
   text_layer_init(&date_layer, GRect(27, 40, 90, 30));
-  text_layer_set_text_alignment(&date_layer, GTextAlignmentCenter);
   text_layer_set_text_color(&date_layer, GColorWhite);
+#endif
+#if DISPLAY_DATE_ANALOG || DISPLAY_DATE_DIGITAL || DISPLAY_DATE_DIGITAL_DAY
+  text_layer_set_text_alignment(&date_layer, GTextAlignmentCenter);
   text_layer_set_background_color(&date_layer, GColorClear);
-  text_layer_set_font(&date_layer, digital);
+  text_layer_set_font(&date_layer, date_font);
   layer_add_child(&window.layer, &date_layer.layer);
 
   draw_date();
-
+#endif
   layer_init(&hour_display_layer, window.layer.frame);
   hour_display_layer.update_proc = &hour_display_layer_update_callback;
   layer_add_child(&window.layer, &hour_display_layer);
@@ -180,22 +227,26 @@ void handle_init(AppContextRef ctx) {
   layer_init(&center_display_layer, window.layer.frame);
   center_display_layer.update_proc = &center_display_layer_update_callback;
   layer_add_child(&window.layer, &center_display_layer);
-
+#if DISPLAY_SECONDS
   layer_init(&second_display_layer, window.layer.frame);
   second_display_layer.update_proc = &second_display_layer_update_callback;
   layer_add_child(&window.layer, &second_display_layer);
+#endif
 }
 
 void handle_deinit(AppContextRef ctx) {
   (void)ctx;
 
   bmp_deinit_container(&background_image_container);
+#if DISPLAY_DATE_DIGITAL || DISPLAY_DATE_DIGITAL_DAY || DISPLAY_ANALOG
+  fonts_unload_custom_font(date_font);
+#endif
 }
 
-void handle_second_tick(AppContextRef ctx, PebbleTickEvent *t){
+void handle_tick(AppContextRef ctx, PebbleTickEvent *t){
   (void)t;
   (void)ctx;
-
+#if DISPLAY_SECONDS
   if(t->tick_time->tm_sec!=0)
   {
      if(t->tick_time->tm_sec%10==0)
@@ -204,21 +255,29 @@ void handle_second_tick(AppContextRef ctx, PebbleTickEvent *t){
      }
      layer_mark_dirty(&second_display_layer);
   }
-  else if(t->tick_time->tm_min!=0&&t->tick_time->tm_hour!=0)
+  else 
+#endif
+  if(t->tick_time->tm_min!=0&&t->tick_time->tm_hour!=0)
   {
      if(t->tick_time->tm_min%2==0)
      {
         layer_mark_dirty(&hour_display_layer);
      }
+#if DISPLAY_SECONDS
      layer_mark_dirty(&second_display_layer);
+#endif
      layer_mark_dirty(&minute_display_layer);
   }
   else
   {
      layer_mark_dirty(&hour_display_layer);
+#if DISPLAY_SECONDS
      layer_mark_dirty(&second_display_layer);
+#endif
      layer_mark_dirty(&minute_display_layer);
+#if DISPLAY_DATE_ANALOG || DISPLAY_DATE_DIGITAL || DISPLAY_DATE_DIGITAL_DAY
      draw_date();
+#endif
   }
 }
 
@@ -227,8 +286,12 @@ void pbl_main(void *params) {
     .init_handler = &handle_init,
     .deinit_handler = &handle_deinit,
     .tick_info = {
-			.tick_handler = &handle_second_tick,
+			.tick_handler = &handle_tick,
+#if DISPLAY_SECONDS
 			.tick_units = SECOND_UNIT
+#else 
+			.tick_units = MINUTE_UNIT
+#endif
 		}
   };
   app_event_loop(params, &handlers);

@@ -5,8 +5,23 @@
     "media": [
     {
       "type":"png",
-      "defName":"IMAGE_BACKGROUND",
+      "defName":"IMAGE_BACKGROUND_LOGO",
       "file":"images/modern_background.png"
+    },
+    {
+      "type":"png",
+      "defName":"IMAGE_BACKGROUND",
+      "file":"images/modern_background2.png"
+    },
+    {
+      "type":"png",
+      "defName":"IMAGE_BACKGROUND_DATEBOX",
+      "file":"images/modern_background3.png"
+    },
+    {
+      "type":"png",
+      "defName":"IMAGE_BACKGROUND_LOGO_DATEBOX",
+      "file":"images/modern_background4.png"
     },
     {
       "type":"png",
@@ -17,6 +32,11 @@
        "type": "font",
        "defName": "FONT_DIGITALDREAM_NARROW_12",
        "file": "fonts/DIGITALDREAMNARROW.ttf"
+    },
+    {
+       "type": "font",
+       "defName": "FONT_ORBITRON_MEDIUM_12",
+       "file": "fonts/orbitron-medium.otf"
     }
     ]
 }
