@@ -19,6 +19,10 @@ TextLayer warstwa_minuta1;
 TextLayer warstwa_minuta2;
 TextLayer warstwa_data;
 
+GFont roboto;
+GFont roboto_bold;
+GFont roboto_small;
+
 static char data_tekst[] = "poniedziałek 00-00-00";
 static char dd_mm_rr[] = "00-00-00";
 
@@ -164,9 +168,9 @@ void handle_init(AppContextRef ctx) {
 
   resource_init_current_app(&APP_RESOURCES);
 
-  GFont roboto = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_ROBOTO_CONDENSED_25));
-  GFont roboto_bold = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_ROBOTO_BOLD_25));
-  GFont roboto_small = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_ROBOTO_CONDENSED_13));
+  roboto = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_ROBOTO_CONDENSED_25));
+  roboto_bold = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_ROBOTO_BOLD_25));
+  roboto_small = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_ROBOTO_CONDENSED_13));
 
   window_set_background_color(&window, GColorBlack);
 
@@ -210,6 +214,14 @@ void handle_init(AppContextRef ctx) {
   set_time(&t);
 }
 
+void handle_deinit(AppContextRef ctx) {
+  (void)ctx;
+
+  fonts_unload_custom_font(roboto);
+  fonts_unload_custom_font(roboto_bold);
+  fonts_unload_custom_font(roboto_small);
+}
+
 void handle_minute_tick(AppContextRef ctx, PebbleTickEvent *t) {
    (void)t;
    (void)ctx;
@@ -221,6 +233,7 @@ void handle_minute_tick(AppContextRef ctx, PebbleTickEvent *t) {
 void pbl_main(void *params) {
   PebbleAppHandlers handlers = {
     .init_handler = &handle_init,
+    .deinit_handler = &handle_deinit,
     .tick_info = {
 			.tick_handler = &handle_minute_tick,
 			.tick_units = MINUTE_UNIT
