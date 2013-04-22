@@ -6,13 +6,13 @@
 #define MY_UUID { 0x4F, 0x4E, 0xEE, 0xFA, 0x16, 0xB0, 0x46, 0xFE, 0x82, 0x1E, 0xDC, 0xCF, 0xB5, 0xD2, 0x27, 0x19 }
 PBL_APP_INFO(MY_UUID,
              "Brown", "Zalew",
-             1, 0, /* App version */
+             1, 1, /* App version */
              RESOURCE_ID_IMAGE_MENU_ICON,
              APP_INFO_WATCH_FACE);
 
-#define DISPLAY_SECONDS
-#define DISPLAY_DATE_SHORT
-#define DISPLAY_DATE_LONG
+#define DISPLAY_SECONDS true
+#define DISPLAY_DATE_SHORT false
+#define DISPLAY_DATE_LONG true
 
 Window window;
 BmpContainer background_image_container;
@@ -24,7 +24,7 @@ Layer center_display_layer;
 Layer second_display_layer;
 #endif
 
-#if DISPLAY_DATE
+#if DISPLAY_DATE_SHORT || DISPLAY_DATE_LONG
 TextLayer date_layer;
 GFont date_font;
 static char date_text[] = "Sat 13";
@@ -222,39 +222,34 @@ void handle_deinit(AppContextRef ctx) {
   (void)ctx;
 
   bmp_deinit_container(&background_image_container);
-#if DISPLAY_DATE
+#if DISPLAY_DATE_SHORT || DISPLAY_DATE_LONG
   fonts_unload_custom_font(date_font);
 #endif
 }
 
-void handle_second_tick(AppContextRef ctx, PebbleTickEvent *t){
+void handle_tick(AppContextRef ctx, PebbleTickEvent *t){
   (void)t;
   (void)ctx;
 
-  if(t->tick_time->tm_sec!=0)
-  {
-     if(t->tick_time->tm_sec%10==0)
-     {
-        layer_mark_dirty(&minute_display_layer);
-     }
-     layer_mark_dirty(&second_display_layer);
-  }
-  else if(t->tick_time->tm_min!=0&&t->tick_time->tm_hour!=0)
+#if DISPLAY_SECONDS
+  layer_mark_dirty(&second_display_layer);
+#endif
+
+  if(t->tick_time->tm_sec%10==0)
   {
      if(t->tick_time->tm_min%2==0)
      {
         layer_mark_dirty(&hour_display_layer);
      }
-     layer_mark_dirty(&second_display_layer);
      layer_mark_dirty(&minute_display_layer);
   }
-  else
+
+#if DISPLAY_DATE_SHORT || DISPLAY_DATE_LONG
+  if(t->tick_time->tm_min==0&&t->tick_time->tm_hour==0)
   {
-     layer_mark_dirty(&hour_display_layer);
-     layer_mark_dirty(&second_display_layer);
-     layer_mark_dirty(&minute_display_layer);
      draw_date();
   }
+#endif
 }
 
 void pbl_main(void *params) {
@@ -262,8 +257,12 @@ void pbl_main(void *params) {
     .init_handler = &handle_init,
     .deinit_handler = &handle_deinit,
     .tick_info = {
-			.tick_handler = &handle_second_tick,
+			.tick_handler = &handle_tick,
+#if DISPLAY_SECONDS
 			.tick_units = SECOND_UNIT
+#else
+			.tick_units = MINUTE_UNIT
+#endif
 		}
   };
   app_event_loop(params, &handlers);
