@@ -13,6 +13,10 @@ PBL_APP_INFO(MY_UUID,
 #define DISPLAY_SECONDS true
 #define DISPLAY_DATE_SHORT false
 #define DISPLAY_DATE_LONG true
+#define SMOOTH_MINUTE false
+#define HOUR_VIBRATION true
+#define HOUR_VIBRATION_START 8
+#define HOUR_VIBRATION_END 20
 
 Window window;
 BmpContainer background_image_container;
@@ -230,7 +234,7 @@ void handle_deinit(AppContextRef ctx) {
 void handle_tick(AppContextRef ctx, PebbleTickEvent *t){
   (void)t;
   (void)ctx;
-
+/*
 #if DISPLAY_SECONDS
   layer_mark_dirty(&second_display_layer);
 #endif
@@ -250,6 +254,43 @@ void handle_tick(AppContextRef ctx, PebbleTickEvent *t){
      draw_date();
   }
 #endif
+*/
+
+
+#if SMOOTH_MINUTE
+  if(t->tick_time->tm_sec%10==0)
+#else
+  if(t->tick_time->tm_sec==0)
+#endif
+  {
+     layer_mark_dirty(&minute_display_layer);
+     
+     if(t->tick_time->tm_sec==0)
+     {
+        if(t->tick_time->tm_min%2==0)
+        {
+           layer_mark_dirty(&hour_display_layer);
+#if DISPLAY_DATE_SHORT || DISPLAY_DATE_LONG
+           if(t->tick_time->tm_min==0&&t->tick_time->tm_hour==0)
+           {
+              draw_date();
+           }
+#endif
+#if HOUR_VIBRATION
+           if(t->tick_time->tm_min==0 &&
+                 t->tick_time->tm_hour>=HOUR_VIBRATION_START &&
+                    t->tick_time->tm_hour<=HOUR_VIBRATION_END)
+           {
+              vibes_double_pulse();
+           }
+#endif
+        }
+     }
+  }
+
+#if DISPLAY_SECONDS
+  layer_mark_dirty(&second_display_layer);
+#endif
 }
 
 void pbl_main(void *params) {
@@ -258,7 +299,7 @@ void pbl_main(void *params) {
     .deinit_handler = &handle_deinit,
     .tick_info = {
 			.tick_handler = &handle_tick,
-#if DISPLAY_SECONDS
+#if DISPLAY_SECONDS || SMOOTH_MINUTE
 			.tick_units = SECOND_UNIT
 #else
 			.tick_units = MINUTE_UNIT

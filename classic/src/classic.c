@@ -11,8 +11,10 @@ PBL_APP_INFO(MY_UUID,
              APP_INFO_WATCH_FACE);
 
 #define DISPLAY_SECONDS true
-#define DISPLAY_TIME true
-#define HOUR_VIBRATION true
+#define DISPLAY_TIME false
+#define HOUR_VIBRATION false
+#define HOUR_VIBRATION_START 8
+#define HOUR_VIBRATION_END 20
 
 Window window;
 
@@ -291,17 +293,19 @@ void handle_tick(AppContextRef ctx, PebbleTickEvent *t){
            {
               draw_date();
            }
+#if HOUR_VIBRATION
+           if(t->tick_time->tm_min==0 &&
+                 t->tick_time->tm_hour>=HOUR_VIBRATION_START &&
+                    t->tick_time->tm_hour<=HOUR_VIBRATION_END)
+           {
+              vibes_double_pulse();
+           }
+#endif
         }
 #if DISPLAY_TIME
         draw_time();
 #endif
-#if HOUR_VIBRATION
-        if(t->tick_time->tm_min==0)
-        {
-           vibes_short_pulse();
-        }
-#endif
-    }
+     }
   }
 
 #if DISPLAY_SECONDS

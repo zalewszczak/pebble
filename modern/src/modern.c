@@ -16,12 +16,17 @@ DISPLAY_DATE_* - draws date PICK ONLY ONE
             +DIGITAL - text with month and day on top
             +DIGITAL_DAY - text with day and month on top
 DISPLAY_LOGO - draws logo at the bottom
+HOUR_VIBRATION - short vibration every hour between 8:00 and 22:00
 */
+
 #define DISPLAY_SECONDS true
 #define DISPLAY_DATE_ANALOG false
 #define DISPLAY_DATE_DIGITAL false
 #define DISPLAY_DATE_DIGITAL_DAY false
 #define DISPLAY_LOGO true
+#define HOUR_VIBRATION false
+#define HOUR_VIBRATION_START 8
+#define HOUR_VIBRATION_END 20
 
 Window window;
 BmpContainer background_image_container;
@@ -244,6 +249,7 @@ void handle_deinit(AppContextRef ctx) {
 void handle_tick(AppContextRef ctx, PebbleTickEvent *t){
   (void)t;
   (void)ctx;
+/*
 #if DISPLAY_SECONDS
   if(t->tick_time->tm_sec!=0)
   {
@@ -277,6 +283,39 @@ void handle_tick(AppContextRef ctx, PebbleTickEvent *t){
      draw_date();
 #endif
   }
+*/
+
+
+  if(t->tick_time->tm_sec%10==0)
+  {
+     layer_mark_dirty(&minute_display_layer);
+     
+     if(t->tick_time->tm_sec==0)
+     {
+        if(t->tick_time->tm_min%2==0)
+        {
+           layer_mark_dirty(&hour_display_layer);
+#if DISPLAY_DATE_ANALOG || DISPLAY_DATE_DIGITAL || DISPLAY_DATE_DIGITAL_DAY
+           if(t->tick_time->tm_min==0&&t->tick_time->tm_hour==0)
+           {
+              draw_date();
+           }
+#endif
+#if HOUR_VIBRATION
+           if(t->tick_time->tm_min==0
+                 &&t->tick_time->tm_hour>=HOUR_VIBRATION_START
+                    &&t->tick_time->tm_hour<=HOUR_VIBRATION_END)
+           {
+              vibes_double_pulse();
+           }
+#endif
+        }
+     }
+  }
+
+#if DISPLAY_SECONDS
+  layer_mark_dirty(&second_display_layer);
+#endif
 }
 
 void pbl_main(void *params) {

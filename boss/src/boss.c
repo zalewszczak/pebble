@@ -14,6 +14,9 @@ PBL_APP_INFO(MY_UUID,
 #define DISPLAY_FILLED_HANDS false
 #define DISPLAY_DATE true
 #define DISPLAY_LOGO true
+#define HOUR_VIBRATION false
+#define HOUR_VIBRATION_START 8
+#define HOUR_VIBRATION_END 20
 
 Window window;
 BmpContainer background_image_container;
@@ -224,19 +227,28 @@ void handle_init(AppContextRef ctx) {
 void handle_tick(AppContextRef ctx, PebbleTickEvent *t){
   (void)t;
   (void)ctx;
+
   if(t->tick_time->tm_sec==0)
   {
-      layer_mark_dirty(&time_display_layer);
+     layer_mark_dirty(&time_display_layer);
+#if DISPLAY_DATE
+     if(t->tick_time->tm_min==0&&t->tick_time->tm_hour==0)
+     {
+        draw_date();
+     }
+#endif
+#if HOUR_VIBRATION
+     if(t->tick_time->tm_min==0
+           &&t->tick_time->tm_hour>=HOUR_VIBRATION_START
+              &&t->tick_time->tm_hour<=HOUR_VIBRATION_END)
+     {
+        vibes_double_pulse();
+     }
+#endif
   }
 
 #if DISPLAY_SECONDS
   layer_mark_dirty(&second_display_layer);
-#endif
-#if DISPLAY_DATE
-  if(t->tick_time->tm_min==0&&t->tick_time->tm_hour==0)
-  {
-     draw_date();
-  }
 #endif
 }
 
