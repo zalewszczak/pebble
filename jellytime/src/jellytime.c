@@ -20,6 +20,10 @@ static char date_text[] = "WED, NOVEMBER 14";
 static char hour_text[] = "17:";
 static char minute_text[] = "46";
 
+GFont roboto;
+GFont roboto_bold;
+GFont roboto_small;
+
 //week starts with sunday!
 static const char* const DAYS[] = {
   "SUN", 
@@ -138,9 +142,18 @@ void handle_minute_tick(AppContextRef ctx, PebbleTickEvent *t) {
   set_time(t->tick_time);
 }
 
+void handle_deinit(AppContextRef ctx) {
+  (void)ctx;
+
+  fonts_unload_custom_font(roboto);
+  fonts_unload_custom_font(roboto_bold);
+  fonts_unload_custom_font(roboto_small);
+}
+
 void pbl_main(void *params) {
   PebbleAppHandlers handlers = {
     .init_handler = &handle_init,
+    .deinit_handler = &handle_deinit,
     .tick_info = {
 			.tick_handler = &handle_minute_tick,
 			.tick_units = MINUTE_UNIT
