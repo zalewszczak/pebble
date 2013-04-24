@@ -49,7 +49,7 @@ const GPathInfo HOUR_HAND_PATH_POINTS = {
   (GPoint []) {
     {-7, 15},
     {7, 15},
-    {7, -45},
+    {0, -45},
   }
 };
 

@@ -16,7 +16,7 @@ HOUR_VIBRATION - short vibration every hour between 8:00 and 22:00
 */
 
 #define DISPLAY_SECONDS false
-#define HOUR_VIBRATION false
+#define HOUR_VIBRATION true
 #define DISPLAY_DATE true
 #define HOUR_VIBRATION_START 8
 #define HOUR_VIBRATION_END 20
@@ -49,7 +49,7 @@ const GPathInfo HOUR_HAND_PATH_POINTS = {
   (GPoint []) {
     {-7, 15},
     {7, 15},
-    {7, -45},
+    {0, -45},
   }
 };
 
@@ -196,7 +196,7 @@ void handle_tick(AppContextRef ctx, PebbleTickEvent *t){
         if(t->tick_time->tm_min%2==0)
         {
            layer_mark_dirty(&hour_display_layer);
-#if DISPLAY_DATE_ANALOG || DISPLAY_DATE_DIGITAL || DISPLAY_DATE_DIGITAL_DAY
+#if DISPLAY_DATE
            if(t->tick_time->tm_min==0&&t->tick_time->tm_hour==0)
            {
               draw_date();
