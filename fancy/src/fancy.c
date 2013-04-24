@@ -196,7 +196,7 @@ void handle_tick(AppContextRef ctx, PebbleTickEvent *t){
         if(t->tick_time->tm_min%2==0)
         {
            layer_mark_dirty(&hour_display_layer);
-#if DISPLAY_DATE_ANALOG || DISPLAY_DATE_DIGITAL || DISPLAY_DATE_DIGITAL_DAY
+#if DISPLAY_DATE
            if(t->tick_time->tm_min==0&&t->tick_time->tm_hour==0)
            {
               draw_date();

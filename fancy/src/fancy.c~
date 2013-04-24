@@ -15,8 +15,8 @@ DISPLAY_DATE - draws date
 HOUR_VIBRATION - short vibration every hour between 8:00 and 22:00
 */
 
-#define DISPLAY_SECONDS true
-#define HOUR_VIBRATION true
+#define DISPLAY_SECONDS false
+#define HOUR_VIBRATION false
 #define DISPLAY_DATE true
 #define HOUR_VIBRATION_START 8
 #define HOUR_VIBRATION_END 20
@@ -140,7 +140,7 @@ void handle_init(AppContextRef ctx) {
 
 #if DISPLAY_DATE
   date_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_EXO_LIGHT_16));
-  text_layer_init(&date_layer, GRect(20, 95, 104, 45));
+  text_layer_init(&date_layer, GRect(20, 100, 104, 45));
   text_layer_set_text_color(&date_layer, GColorWhite);
   text_layer_set_text_alignment(&date_layer, GTextAlignmentCenter);
   text_layer_set_background_color(&date_layer, GColorClear);
