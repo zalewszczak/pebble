@@ -3,9 +3,9 @@
 #include "pebble_fonts.h"
 
 
-#define MY_UUID { 0xEB, 0x90, 0x36, 0x94, 0xC0, 0xF9, 0x42, 0x0F, 0x92, 0x43, 0x20, 0x40, 0x45, 0x70, 0xD2, 0x2D }
+#define MY_UUID { 0xE5, 0x5F, 0x45, 0xB9, 0xF1, 0x57, 0x4B, 0x97, 0xBB, 0x46, 0x72, 0xF2, 0xC3, 0xC8, 0x54, 0xBB }
 PBL_APP_INFO(MY_UUID,
-             "Fancy", "Zalew",
+             "Speed", "Zalew",
              1, 0, /* App version */
              RESOURCE_ID_IMAGE_MENU_ICON,
              APP_INFO_WATCH_FACE);
@@ -15,9 +15,9 @@ DISPLAY_DATE - draws date
 HOUR_VIBRATION - short vibration every hour between 8:00 and 22:00
 */
 
-#define DISPLAY_SECONDS false
-#define HOUR_VIBRATION false
+#define DISPLAY_SECONDS true
 #define DISPLAY_DATE true
+#define HOUR_VIBRATION true
 #define HOUR_VIBRATION_START 8
 #define HOUR_VIBRATION_END 20
 
@@ -31,29 +31,28 @@ Layer second_display_layer;
 #if DISPLAY_DATE
 TextLayer date_layer;
 GFont date_font;
-static char date_text[] = "Sat 20";
+static char date_text[] = "WED 24";
 #endif
 
 const GPathInfo MINUTE_HAND_PATH_POINTS = {
-  3,
+  4,
   (GPoint []) {
-    {-6, 15},
-    {6, 15},
-    {0, -65},
+    {-5, 15},
+    {5, 15},
+    {3, -60},
+    {-3,  -60},
   }
 };
-
 
 const GPathInfo HOUR_HAND_PATH_POINTS = {
-  3,
+  4,
   (GPoint []) {
-    {-7, 15},
-    {7, 15},
-    {0, -45},
+    {-5, 15},
+    {5, 15},
+    {3, -40},
+    {-3,  -40},
   }
 };
-
-
 GPath hour_hand_path;
 GPath minute_hand_path;
 
@@ -65,25 +64,37 @@ void second_display_layer_update_callback(Layer *me, GContext* ctx) {
   get_time(&t);
 
   int32_t second_angle = t.tm_sec * (0xffff/60);
+  int32_t counter_second_angle = t.tm_sec * (0xffff/60);
+  if(t.tm_sec<30)
+  {
+     counter_second_angle += 0xffff/2;
+  }
+  else
+  {
+     counter_second_angle -= 0xffff/2;
+  }
   int second_hand_length = 60;
+  int counter_second_hand_length = 15;
 
   graphics_context_set_fill_color(ctx, GColorWhite);
 
   GPoint center = grect_center_point(&me->frame);
+  GPoint counter_second = GPoint(center.x + counter_second_hand_length * sin_lookup(counter_second_angle)/0xffff,
+				center.y + (-counter_second_hand_length) * cos_lookup(counter_second_angle)/0xffff);
   GPoint second = GPoint(center.x + second_hand_length * sin_lookup(second_angle)/0xffff,
 				center.y + (-second_hand_length) * cos_lookup(second_angle)/0xffff);
 
-  graphics_draw_line(ctx, center, second);
+  graphics_draw_line(ctx, counter_second, second);
 }
 #endif
 void center_display_layer_update_callback(Layer *me, GContext* ctx) {
   (void)me;
 
   GPoint center = grect_center_point(&me->frame);
-  graphics_context_set_fill_color(ctx, GColorBlack);
-  graphics_fill_circle(ctx, center, 2);
   graphics_context_set_fill_color(ctx, GColorWhite);
-  graphics_fill_circle(ctx, center, 1);
+  graphics_fill_circle(ctx, center, 10);
+  graphics_context_set_fill_color(ctx, GColorBlack);
+  graphics_fill_circle(ctx, center, 9);
 }
 
 void minute_display_layer_update_callback(Layer *me, GContext* ctx) {
@@ -117,7 +128,6 @@ void hour_display_layer_update_callback(Layer *me, GContext* ctx) {
   graphics_context_set_stroke_color(ctx, GColorBlack);
   gpath_draw_outline(ctx, &hour_hand_path);
 }
-
 #if DISPLAY_DATE
 void draw_date(){
   PblTm t;
@@ -131,7 +141,7 @@ void draw_date(){
 void handle_init(AppContextRef ctx) {
   (void)ctx;
 
-  window_init(&window, "Modern Watch");
+  window_init(&window, "Speed Watch");
   window_stack_push(&window, true /* Animated */);
   resource_init_current_app(&APP_RESOURCES);
 
@@ -139,8 +149,8 @@ void handle_init(AppContextRef ctx) {
   layer_add_child(&window.layer, &background_image_container.layer.layer);
 
 #if DISPLAY_DATE
-  date_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_EXO_LIGHT_16));
-  text_layer_init(&date_layer, GRect(20, 100, 104, 45));
+  date_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_DIGITALDREAM_NARROW_14));
+  text_layer_init(&date_layer, GRect(27, 45, 90, 30));
   text_layer_set_text_color(&date_layer, GColorWhite);
   text_layer_set_text_alignment(&date_layer, GTextAlignmentCenter);
   text_layer_set_background_color(&date_layer, GColorClear);
@@ -149,7 +159,6 @@ void handle_init(AppContextRef ctx) {
 
   draw_date();
 #endif
-
   layer_init(&hour_display_layer, window.layer.frame);
   hour_display_layer.update_proc = &hour_display_layer_update_callback;
   layer_add_child(&window.layer, &hour_display_layer);
@@ -163,15 +172,15 @@ void handle_init(AppContextRef ctx) {
 
   gpath_init(&minute_hand_path, &MINUTE_HAND_PATH_POINTS);
   gpath_move_to(&minute_hand_path, grect_center_point(&minute_display_layer.frame));
-
-  layer_init(&center_display_layer, window.layer.frame);
-  center_display_layer.update_proc = &center_display_layer_update_callback;
-  layer_add_child(&window.layer, &center_display_layer);
 #if DISPLAY_SECONDS
   layer_init(&second_display_layer, window.layer.frame);
   second_display_layer.update_proc = &second_display_layer_update_callback;
   layer_add_child(&window.layer, &second_display_layer);
 #endif
+
+  layer_init(&center_display_layer, window.layer.frame);
+  center_display_layer.update_proc = &center_display_layer_update_callback;
+  layer_add_child(&window.layer, &center_display_layer);
 }
 
 void handle_deinit(AppContextRef ctx) {

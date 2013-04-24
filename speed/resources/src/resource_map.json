@@ -1,0 +1,21 @@
+
+{"friendlyVersion": "VERSION",
+ "versionDefName": "APP_RESOURCES",
+ "media": [
+    {
+      "type":"png",
+      "defName":"IMAGE_BACKGROUND",
+      "file":"images/speed_background.png"
+    },
+    {
+      "type":"png",
+      "defName":"IMAGE_MENU_ICON",
+      "file":"images/speed_logo.png"
+    },
+    {
+       "type": "font",
+       "defName": "FONT_DIGITALDREAM_NARROW_14",
+       "file": "fonts/DIGITALDREAMNARROW.ttf"
+    }
+	  ]
+}

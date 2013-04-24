@@ -15,9 +15,9 @@ DISPLAY_DATE - draws date
 HOUR_VIBRATION - short vibration every hour between 8:00 and 22:00
 */
 
-#define DISPLAY_SECONDS true
-#define HOUR_VIBRATION true
-#define DISPLAY_DATE true
+#define DISPLAY_SECONDS false
+#define HOUR_VIBRATION false
+#define DISPLAY_DATE false
 #define HOUR_VIBRATION_START 8
 #define HOUR_VIBRATION_END 20
 
