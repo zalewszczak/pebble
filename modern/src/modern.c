@@ -21,10 +21,10 @@ HOUR_VIBRATION - short vibration every hour between 8:00 and 22:00
 
 #define DISPLAY_SECONDS true
 #define DISPLAY_DATE_ANALOG false
-#define DISPLAY_DATE_DIGITAL false
+#define DISPLAY_DATE_DIGITAL true
 #define DISPLAY_DATE_DIGITAL_DAY false
-#define DISPLAY_LOGO true
-#define HOUR_VIBRATION false
+#define DISPLAY_LOGO false
+#define HOUR_VIBRATION true
 #define HOUR_VIBRATION_START 8
 #define HOUR_VIBRATION_END 20
 

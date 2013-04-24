@@ -10,11 +10,11 @@ PBL_APP_INFO(MY_UUID,
              RESOURCE_ID_IMAGE_MENU_ICON,
              APP_INFO_WATCH_FACE);
 
-#define DISPLAY_SECONDS true
-#define DISPLAY_FILLED_HANDS false
-#define DISPLAY_DATE true
+#define DISPLAY_SECONDS false
+#define DISPLAY_FILLED_HANDS true
+#define DISPLAY_DATE false
 #define DISPLAY_LOGO true
-#define HOUR_VIBRATION false
+#define HOUR_VIBRATION true
 #define HOUR_VIBRATION_START 8
 #define HOUR_VIBRATION_END 20
 

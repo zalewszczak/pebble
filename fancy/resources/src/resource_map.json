@@ -1,0 +1,22 @@
+
+{"friendlyVersion": "VERSION",
+ "versionDefName": "APP_RESOURCES",
+
+    "media": [
+    {
+      "type":"png",
+      "defName":"IMAGE_BACKGROUND",
+      "file":"images/fancy_background.png"
+    },
+    {
+      "type":"png",
+      "defName":"IMAGE_MENU_ICON",
+      "file":"images/fancy_logo.png"
+    },
+    {
+       "type": "font",
+       "defName": "FONT_EXO_LIGHT_16",
+       "file": "fonts/Exo-Light.otf"
+    }
+    ]
+}

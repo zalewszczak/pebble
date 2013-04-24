@@ -13,7 +13,7 @@ PBL_APP_INFO(MY_UUID,
 #define DISPLAY_SECONDS true
 #define DISPLAY_LOGO true
 #define DISPLAY_DATE true
-#define HOUR_VIBRATION false
+#define HOUR_VIBRATION true
 #define HOUR_VIBRATION_START 8
 #define HOUR_VIBRATION_END 20
 
