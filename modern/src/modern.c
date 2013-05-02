@@ -21,8 +21,8 @@ HOUR_VIBRATION - short vibration every hour between 8:00 and 22:00
 
 #define DISPLAY_SECONDS true
 #define DISPLAY_DATE_ANALOG false
-#define DISPLAY_DATE_DIGITAL true
-#define DISPLAY_DATE_DIGITAL_DAY false
+#define DISPLAY_DATE_DIGITAL false
+#define DISPLAY_DATE_DIGITAL_DAY true
 #define DISPLAY_LOGO false
 #define HOUR_VIBRATION true
 #define HOUR_VIBRATION_START 8
@@ -38,7 +38,7 @@ Layer second_display_layer;
 #if DISPLAY_DATE_ANALOG || DISPLAY_DATE_DIGITAL || DISPLAY_DATE_DIGITAL_DAY
 TextLayer date_layer;
 GFont date_font;
-static char date_text[] = "12-04-13";
+static char date_text[] = "Wed 13";
 #endif
 
 const GPathInfo MINUTE_HAND_PATH_POINTS = {
@@ -51,15 +51,6 @@ const GPathInfo MINUTE_HAND_PATH_POINTS = {
   }
 };
 
-const GPathInfo MINUTE_HAND_OUTLINE_PATH_POINTS = {
-  4,
-  (GPoint []) {
-    {-5, 16},
-    {5, 16},
-    {5, -71},
-    {-5,  -71},
-  }
-};
 
 const GPathInfo HOUR_HAND_PATH_POINTS = {
   4,
@@ -71,20 +62,9 @@ const GPathInfo HOUR_HAND_PATH_POINTS = {
   }
 };
 
-const GPathInfo HOUR_HAND_OUTLINE_PATH_POINTS = {
-  4,
-  (GPoint []) {
-    {-5, 16},
-    {5, 16},
-    {5, -51},
-    {-5,  -51},
-  }
-};
 
 GPath hour_hand_path;
-GPath hour_hand_outline_path;
 GPath minute_hand_path;
-GPath minute_hand_outline_path;
 
 #if DISPLAY_SECONDS
 void second_display_layer_update_callback(Layer *me, GContext* ctx) {
@@ -96,7 +76,7 @@ void second_display_layer_update_callback(Layer *me, GContext* ctx) {
   int32_t second_angle = t.tm_sec * (0xffff/60);
   int second_hand_length = 70;
 
-  graphics_context_set_fill_color(ctx, GColorWhite);
+  graphics_context_set_stroke_color(ctx, GColorWhite);
 
   GPoint center = grect_center_point(&me->frame);
   GPoint second = GPoint(center.x + second_hand_length * sin_lookup(second_angle)/0xffff,
@@ -124,12 +104,11 @@ void minute_display_layer_update_callback(Layer *me, GContext* ctx) {
 
   unsigned int angle = t.tm_min * 6 + t.tm_sec / 10;
   gpath_rotate_to(&minute_hand_path, (TRIG_MAX_ANGLE / 360) * angle);
-  gpath_rotate_to(&minute_hand_outline_path, (TRIG_MAX_ANGLE / 360) * angle);
   
-  graphics_context_set_fill_color(ctx, GColorBlack);
-  gpath_draw_filled(ctx, &minute_hand_outline_path);
   graphics_context_set_fill_color(ctx, GColorWhite);
   gpath_draw_filled(ctx, &minute_hand_path);
+  graphics_context_set_stroke_color(ctx, GColorBlack);
+  gpath_draw_outline(ctx, &minute_hand_path);
 }
 
 void hour_display_layer_update_callback(Layer *me, GContext* ctx) {
@@ -141,12 +120,11 @@ void hour_display_layer_update_callback(Layer *me, GContext* ctx) {
 
   unsigned int angle = t.tm_hour * 30 + t.tm_min / 2;
   gpath_rotate_to(&hour_hand_path, (TRIG_MAX_ANGLE / 360) * angle);
-  gpath_rotate_to(&hour_hand_outline_path, (TRIG_MAX_ANGLE / 360) * angle);
 
-  graphics_context_set_fill_color(ctx, GColorBlack);
-  gpath_draw_filled(ctx, &hour_hand_outline_path);
   graphics_context_set_fill_color(ctx, GColorWhite);
   gpath_draw_filled(ctx, &hour_hand_path);
+  graphics_context_set_stroke_color(ctx, GColorBlack);
+  gpath_draw_outline(ctx, &hour_hand_path);
 }
 #if DISPLAY_DATE_ANALOG
 void draw_date(){
@@ -213,8 +191,6 @@ void handle_init(AppContextRef ctx) {
   hour_display_layer.update_proc = &hour_display_layer_update_callback;
   layer_add_child(&window.layer, &hour_display_layer);
 
-  gpath_init(&hour_hand_outline_path, &HOUR_HAND_OUTLINE_PATH_POINTS);
-  gpath_move_to(&hour_hand_outline_path, grect_center_point(&hour_display_layer.frame));
   gpath_init(&hour_hand_path, &HOUR_HAND_PATH_POINTS);
   gpath_move_to(&hour_hand_path, grect_center_point(&hour_display_layer.frame));
 
@@ -222,8 +198,6 @@ void handle_init(AppContextRef ctx) {
   minute_display_layer.update_proc = &minute_display_layer_update_callback;
   layer_add_child(&window.layer, &minute_display_layer);
 
-  gpath_init(&minute_hand_outline_path, &MINUTE_HAND_OUTLINE_PATH_POINTS);
-  gpath_move_to(&minute_hand_outline_path, grect_center_point(&minute_display_layer.frame));
   gpath_init(&minute_hand_path, &MINUTE_HAND_PATH_POINTS);
   gpath_move_to(&minute_hand_path, grect_center_point(&minute_display_layer.frame));
 

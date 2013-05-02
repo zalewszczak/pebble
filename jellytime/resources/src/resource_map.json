@@ -4,18 +4,27 @@
  "media": [
        {
        "type": "font",
-       "defName": "FONT_ROBOTO_THIN_40",
+       "characterRegex": "[:0-9]",
+       "defName": "FONT_ROBOTO_THIN_49",
        "file": "fonts/Roboto-Thin.ttf"
        },
        {
        "type": "font",
+       "characterRegex": "[0-9,A-Z]",
        "defName": "FONT_ROBOTO_REGULAR_12",
        "file": "fonts/Roboto-Regular.ttf"
        },
        {
        "type": "font",
-       "defName": "FONT_ROBOTO_BOLD_40",
+       "characterRegex": "[0-9]",
+       "defName": "FONT_ROBOTO_BOLD_49",
        "file": "fonts/Roboto-Bold.ttf"
+       },
+       {
+       "type": "font",
+       "characterRegex": "[APM]",
+       "defName": "FONT_ROBOTO_REGULAR_10",
+       "file": "fonts/Roboto-Regular.ttf"
        },
      {
       "type":"png",
