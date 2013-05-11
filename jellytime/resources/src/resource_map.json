@@ -10,7 +10,6 @@
        },
        {
        "type": "font",
-       "characterRegex": "[0-9,A-Z]",
        "defName": "FONT_ROBOTO_REGULAR_12",
        "file": "fonts/Roboto-Regular.ttf"
        },

@@ -2,15 +2,16 @@
 #include "pebble_app.h"
 #include "pebble_fonts.h"
 
+#include "build_config.h"
 
 #define MY_UUID { 0x54, 0xF4, 0x35, 0xAB, 0xC0, 0x2A, 0x40, 0x5F, 0x9F, 0xD6, 0x52, 0x39, 0x0F, 0xD8, 0x81, 0x9D }
 PBL_APP_INFO(MY_UUID,
-             "Jellly Time", "Zalew",
-             1, 1, /* App version */
+             "Jelly Time", "Zalew",
+             1, 3, /* App version */
              RESOURCE_ID_IMAGE_MENU_ICON,
              APP_INFO_WATCH_FACE);
 
-#define HOUR_VIBRATION false
+#define HOUR_VIBRATION true
 #define HOUR_VIBRATION_START 8
 #define HOUR_VIBRATION_END 20
 
@@ -37,38 +38,36 @@ PropertyAnimation prop_animation_12h;
 
 bool aligned_to_single = false;
 
-//week starts with sunday!
-static const char* const DAYS[] = {
-  "SUN", 
-  "MON",
-  "TUE",
-  "WED",
-  "THU",
-  "FRI",
-  "SAT"
-};
-
-static const char* const MONTHS[] = {
-  "JANUARY",
-  "FEBRUARY",
-  "MARCH",
-  "APRIL",
-  "MAY",
-  "JUNE",
-  "JULY",
-  "AUGUST",
-  "SEPTEMBER",
-  "OCTOBER",
-  "NOVEMBER",
-  "DECEMBER"
-};
-
 static const char* const MODES[] = {
   "AM", 
   "PM",
 };
 
+#include "lang.h"
+
+/*
 void draw_date(PblTm* t) {
+  get_date_formatted(date_text, t);
+
+  char day[] = "14";
+  string_format_time(day, sizeof(day), "%d", t);
+  
+  size_t size = sizeof(date_text);
+  memset(date_text, 0, size);
+
+  strncat(date_text, DAYS[t->tm_wday], size);
+  size -= strlen(DAYS[t->tm_wday]);
+  strncat(date_text, ", ", size);
+  size -= strlen(", ");
+  strncat(date_text, MONTHS[t->tm_mon], size);
+  size -= strlen(MONTHS[t->tm_mon]);
+  strncat(date_text, " ", size);
+  size -= strlen(" ");
+  strncat(date_text, day, size);
+
+  text_layer_set_text(&date_layer, date_text);
+
+
   char day[] = "14";
   string_format_time(day, sizeof(day), "%d", t);
   
@@ -79,13 +78,14 @@ void draw_date(PblTm* t) {
   size -= strlen(DAYS[t->tm_wday]);
   strncat(date_text, ", ", size);
   size -= strlen(", ");
-  strncat(date_text, MONTHS[t->tm_mon], size);
-  size -= strlen(MONTHS[t->tm_mon]);
+  strncat(date_text, day, size);
+  size -= strlen(day);
   strncat(date_text, " ", size);
   size -= strlen(" ");
-  strncat(date_text, day, size);
+  strncat(date_text, MONTHS[t->tm_mon], size);
   text_layer_set_text(&date_layer, date_text);
 }
+*/
 
 void align_time_double(){
    if(aligned_to_single)
@@ -170,7 +170,7 @@ void set_time(PblTm* t) {
       draw_date(t);
    }
 #if HOUR_VIBRATION
-   if(t->tm_min==0&&t->tm_hour>=HOUR_VIBRATION_START&&t->tm_hour<=HOUR_VIBRATION_END)
+   if(t->tm_min==0&&t->tm_sec==0&&t->tm_hour>=HOUR_VIBRATION_START&&t->tm_hour<=HOUR_VIBRATION_END)
    {
       vibes_double_pulse();
    }

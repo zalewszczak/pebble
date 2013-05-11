@@ -5,12 +5,12 @@
     {
       "type":"png",
       "defName":"IMAGE_BACKGROUND",
-      "file":"images/maurice_background3.png"
+      "file":"images/maurice_background4.png"
     },
     {
       "type":"png",
-      "defName":"IMAGE_BACKGROUND_LOGO",
-      "file":"images/maurice_background4.png"
+      "defName":"IMAGE_BACKGROUND_INVERTED",
+      "file":"images/maurice_background5.png"
     },
     {
       "type":"png",
@@ -19,6 +19,7 @@
     },
     {
        "type": "font",
+       "characterRegex": "[0-9 .A-Z]",
        "defName": "FONT_RADIOLAND_15",
        "file": "fonts/RADIOLAND.ttf"
     }

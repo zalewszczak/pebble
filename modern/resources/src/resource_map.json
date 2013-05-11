@@ -5,23 +5,18 @@
     "media": [
     {
       "type":"png",
-      "defName":"IMAGE_BACKGROUND_LOGO",
-      "file":"images/modern_background.png"
+      "defName":"IMAGE_BACKGROUND",
+      "file":"images/modern_background_new.png"
     },
     {
       "type":"png",
-      "defName":"IMAGE_BACKGROUND",
-      "file":"images/modern_background2.png"
+      "defName":"IMAGE_BACKGROUND_INVERTED",
+      "file":"images/modern_background_new_inv.png"
     },
     {
       "type":"png",
       "defName":"IMAGE_BACKGROUND_DATEBOX",
       "file":"images/modern_background3.png"
-    },
-    {
-      "type":"png",
-      "defName":"IMAGE_BACKGROUND_LOGO_DATEBOX",
-      "file":"images/modern_background4.png"
     },
     {
       "type":"png",
@@ -31,11 +26,13 @@
     {
        "type": "font",
        "defName": "FONT_DIGITALDREAM_NARROW_12",
+       "characterRegex": "[0-9. A-Z]",
        "file": "fonts/DIGITALDREAMNARROW.ttf"
     },
     {
        "type": "font",
        "defName": "FONT_ORBITRON_MEDIUM_12",
+       "characterRegex": "[0-9]",
        "file": "fonts/orbitron-medium.otf"
     }
     ]
