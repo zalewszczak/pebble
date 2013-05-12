@@ -1,0 +1,28 @@
+{
+    "friendlyVersion": "dev_0.0",
+    "versionDefName": "APP_RESOURCES",
+
+    "media": [
+    {
+      "type":"png",
+      "defName":"IMAGE_BACKGROUND",
+      "file":"images/simon_background.png"
+    },
+    {
+      "type":"png",
+      "defName":"IMAGE_BACKGROUND_INVERTED",
+      "file":"images/simon_background_inverted.png"
+    },
+    {
+      "type":"png",
+      "defName":"IMAGE_MENU_ICON",
+      "file":"images/simon_logo.png"
+    },
+    {
+       "type": "font",
+       "defName": "FONT_ROBOTO_REGULAR_12",
+       "characterRegex": "[0-9]",
+       "file": "fonts/Roboto-Regular.ttf"
+    }
+    ]
+}
