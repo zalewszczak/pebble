@@ -1,0 +1,28 @@
+{
+    "friendlyVersion": "dev_0.0",
+    "versionDefName": "APP_RESOURCES",
+
+    "media": [
+    {
+      "type":"png",
+      "defName":"IMAGE_BACKGROUND",
+      "file":"images/roman_background.png"
+    },
+    {
+      "type":"png",
+      "defName":"IMAGE_BACKGROUND_INVERTED",
+      "file":"images/roman_background_inverted.png"
+    },
+    {
+      "type":"png",
+      "defName":"IMAGE_MENU_ICON",
+      "file":"images/roman_logo.png"
+    },
+    {
+       "type": "font",
+       "defName": "FONT_DIGITALDREAM_NARROW_12",
+       "characterRegex": "[0-9. A-Z]",
+       "file": "fonts/DIGITALDREAMNARROW.ttf"
+    }
+    ]
+}
