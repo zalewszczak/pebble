@@ -9,8 +9,8 @@
     },
     {
       "type":"png",
-      "defName":"IMAGE_BACKGROUND_BOX",
-      "file":"images/brown_background2.png"
+      "defName":"IMAGE_BACKGROUND_INVERTED",
+      "file":"images/brown_background_inverted.png"
     },
     {
       "type":"png",
@@ -19,8 +19,8 @@
     },
     {
        "type": "font",
-       "defName": "FONT_OPENSANS_REGULAR_14",
-       "file": "fonts/OpenSans-Regular.ttf"
+       "defName": "FONT_DEJAVU_SANS_10",
+       "file": "fonts/DejaVuSans.ttf"
     }
     ]
 }

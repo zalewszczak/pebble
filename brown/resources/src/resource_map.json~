@@ -9,6 +9,11 @@
     },
     {
       "type":"png",
+      "defName":"IMAGE_BACKGROUND_BOX",
+      "file":"images/brown_background2.png"
+    },
+    {
+      "type":"png",
       "defName":"IMAGE_MENU_ICON",
       "file":"images/brown_logo.png"
     },
