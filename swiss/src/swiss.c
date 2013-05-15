@@ -3,9 +3,9 @@
 #include "pebble_fonts.h"
 
 
-#define MY_UUID { 0x4A, 0xAF, 0x8D, 0xC1, 0x4F, 0xC3, 0x42, 0x74, 0xBB, 0xEC, 0xD3, 0xD1, 0x2A, 0xB6, 0x29, 0x61 }
+#define MY_UUID { 0x47, 0x22, 0xB2, 0x7C, 0x94, 0x8C, 0x4D, 0xEC, 0x86, 0xA5, 0x08, 0xA7, 0x10, 0xF2, 0x43, 0xB7 }
 PBL_APP_INFO(MY_UUID,
-             "Roman", "Zalew",
+             "Swiss", "Zalew",
              1, 0, /* App version */
              RESOURCE_ID_IMAGE_MENU_ICON,
              APP_INFO_WATCH_FACE);
@@ -21,34 +21,32 @@ Layer minute_display_layer;
 Layer hour_display_layer;
 Layer center_display_layer;
 Layer second_display_layer;
+#if DISPLAY_DATE
 TextLayer date_layer;
 GFont date_font;
 static char date_text[] = "ABCD. 12";
+#endif
 
 #include "lang.h"
 
 const GPathInfo MINUTE_HAND_PATH_POINTS = {
-  6,
+  4,
   (GPoint []) {
-    {-4, 15},
-    {4, 15},
-    {5, 0},
-    {4, -70},
-    {-4,  -70},
-    {-5, 0},
+    {-5, 18},
+    {4, 18},
+    {4, -65},
+    {-5, -65},
   }
 };
 
 
 const GPathInfo HOUR_HAND_PATH_POINTS = {
-  6,
+  4,
   (GPoint []) {
-    {-4, 15},
-    {4, 15},
-    {5, 0},
-    {4, -45},
-    {-4,  -45},
-    {-5, 0},
+    {-5, 18},
+    {4, 18},
+    {4, -40},
+    {-5,  -40},
   }
 };
 
@@ -91,18 +89,15 @@ void handle_timer(AppContextRef ctx, AppTimerHandle handle, uint32_t cookie) {
         layer_mark_dirty(&minute_display_layer);
         timer_handle = app_timer_send_event(ctx, 50 /* milliseconds */, COOKIE_MY_TIMER);
     }
-#if DISPLAY_SECONDS
     else if(init_anim==ANIM_SECONDS)
     {
         layer_mark_dirty(&second_display_layer);
         timer_handle = app_timer_send_event(ctx, 50 /* milliseconds */, COOKIE_MY_TIMER);
     }
-#endif
   }
 
 }
 
-#if DISPLAY_SECONDS && INVERTED
 void second_display_layer_update_callback(Layer *me, GContext* ctx) {
   (void)me;
 
@@ -119,16 +114,17 @@ void second_display_layer_update_callback(Layer *me, GContext* ctx) {
   {
      counter_second_angle -= 0xffff/2;
   }
-  int second_hand_length = 70;
-  int counter_second_hand_length = 15;
+  int second_hand_length = 54;
+  int counter_second_hand_length = 18;
+  int circle_radius = 7;
   GPoint center = grect_center_point(&me->frame);
   GPoint second = GPoint(center.x, center.y - second_hand_length);
   GPoint counter_second = GPoint(center.x, center.y + counter_second_hand_length);
 
   if(init_anim < ANIM_SECONDS)
   {
-     second = GPoint(center.x, center.y - 70);
-     counter_second = GPoint(center.x, center.y + 15);
+     second = GPoint(center.x, center.y - second_hand_length);
+     counter_second = GPoint(center.x, center.y + counter_second_hand_length);
   }
   else if(init_anim==ANIM_SECONDS)
   {
@@ -164,79 +160,27 @@ void second_display_layer_update_callback(Layer *me, GContext* ctx) {
      counter_second = GPoint(center.x + counter_second_hand_length * sin_lookup(counter_second_angle)/0xffff,
 		        center.y + (-counter_second_hand_length) * cos_lookup(counter_second_angle)/0xffff);
   }
+
+
+#if INVERTED
+  graphics_context_set_stroke_color(ctx, GColorWhite);
+  graphics_context_set_fill_color(ctx, GColorBlack);
+  graphics_fill_circle(ctx, second, circle_radius);
+  graphics_draw_circle(ctx, second, circle_radius);
 
   graphics_context_set_stroke_color(ctx, GColorBlack);
-
   graphics_draw_line(ctx, counter_second, second);
-}
-#elif DISPLAY_SECONDS
-void second_display_layer_update_callback(Layer *me, GContext* ctx) {
-  (void)me;
-
-  PblTm t;
-  get_time(&t);
-
-  int32_t second_angle = t.tm_sec * (0xffff/60);
-  int32_t counter_second_angle = t.tm_sec * (0xffff/60);
-  if(t.tm_sec<30)
-  {
-     counter_second_angle += 0xffff/2;
-  }
-  else
-  {
-     counter_second_angle -= 0xffff/2;
-  }
-  int second_hand_length = 70;
-  int counter_second_hand_length = 15;
-  GPoint center = grect_center_point(&me->frame);
-  GPoint second = GPoint(center.x, center.y - second_hand_length);
-  GPoint counter_second = GPoint(center.x, center.y + counter_second_hand_length);
-
-  if(init_anim < ANIM_SECONDS)
-  {
-     second = GPoint(center.x, center.y - 70);
-     counter_second = GPoint(center.x, center.y + 15);
-  }
-  else if(init_anim==ANIM_SECONDS)
-  {
-     second_angle_anim += 0xffff/60;
-     if(second_angle_anim<0xffff/2)
-     {
-        counter_second_angle_anim += 0xffff/2;
-     }
-     else
-     {
-        counter_second_angle_anim -= 0xffff/2;
-     }
-     if(second_angle_anim >= second_angle)
-     {
-        init_anim = ANIM_DONE;
-        second = GPoint(center.x + second_hand_length * sin_lookup(second_angle)/0xffff,
-				center.y + (-second_hand_length) * cos_lookup(second_angle)/0xffff);
-        counter_second = GPoint(center.x + counter_second_hand_length * sin_lookup(counter_second_angle)/0xffff,
-				center.y + (-counter_second_hand_length) * cos_lookup(counter_second_angle)/0xffff);
-     }
-     else
-     {
-        second = GPoint(center.x + second_hand_length * sin_lookup(second_angle_anim)/0xffff,
-				center.y + (-second_hand_length) * cos_lookup(second_angle_anim)/0xffff);
-        counter_second = GPoint(center.x + counter_second_hand_length * sin_lookup(counter_second_angle_anim)/0xffff,
-				center.y + (-counter_second_hand_length) * cos_lookup(counter_second_angle_anim)/0xffff);
-     }
-  }
-  else 
-  {
-     second = GPoint(center.x + second_hand_length * sin_lookup(second_angle)/0xffff,
-			center.y + (-second_hand_length) * cos_lookup(second_angle)/0xffff);
-     counter_second = GPoint(center.x + counter_second_hand_length * sin_lookup(counter_second_angle)/0xffff,
-		        center.y + (-counter_second_hand_length) * cos_lookup(counter_second_angle)/0xffff);
-  }
+#else
+  graphics_context_set_stroke_color(ctx, GColorBlack);
+  graphics_context_set_fill_color(ctx, GColorWhite);
+  graphics_fill_circle(ctx, second, circle_radius);
+  graphics_draw_circle(ctx, second, circle_radius);
 
   graphics_context_set_stroke_color(ctx, GColorWhite);
-
   graphics_draw_line(ctx, counter_second, second);
-}
 #endif
+
+}
 void center_display_layer_update_callback(Layer *me, GContext* ctx) {
   (void)me;
 
@@ -272,11 +216,7 @@ void minute_display_layer_update_callback(Layer *me, GContext* ctx) {
      minute_angle_anim += 6;
      if(minute_angle_anim >= angle)
      {
-#if DISPLAY_SECONDS
         init_anim = ANIM_SECONDS;
-#else
-        init_anim = ANIM_DONE;
-#endif
      }
      else
      {
@@ -342,6 +282,7 @@ void hour_display_layer_update_callback(Layer *me, GContext* ctx) {
   gpath_draw_filled(ctx, &hour_hand_path);
   gpath_draw_outline(ctx, &hour_hand_path);
 }
+#if DISPLAY_DATE
 void draw_date(){
   PblTm t;
   get_time(&t);
@@ -359,7 +300,7 @@ void draw_date(){
   strncat(date_text, day, size);
   text_layer_set_text(&date_layer, date_text);
 }
-
+#endif
 void handle_init(AppContextRef ctx) {
   (void)ctx;
 
@@ -374,19 +315,23 @@ void handle_init(AppContextRef ctx) {
 #endif
   layer_add_child(&window.layer, &background_image_container.layer.layer);
 
-  date_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_DIGITALDREAM_NARROW_12));
-  text_layer_init(&date_layer, GRect(27, 106, 90, 30));
-#if INVERTED
+#if DISPLAY_DATE
+  date_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_ORBITRON_HEAVY_18));
+  text_layer_init(&date_layer, GRect(17, 116, 110, 30));
+#endif
+#if DISPLAY_DATE && INVERTED
   text_layer_set_text_color(&date_layer, GColorBlack);
-#else
+#elif DISPLAY_DATE
   text_layer_set_text_color(&date_layer, GColorWhite);
 #endif
+#if DISPLAY_DATE
   text_layer_set_text_alignment(&date_layer, GTextAlignmentCenter);
   text_layer_set_background_color(&date_layer, GColorClear);
   text_layer_set_font(&date_layer, date_font);
   layer_add_child(&window.layer, &date_layer.layer);
 
   draw_date();
+#endif
 
   layer_init(&hour_display_layer, window.layer.frame);
   hour_display_layer.update_proc = &hour_display_layer_update_callback;
@@ -405,18 +350,19 @@ void handle_init(AppContextRef ctx) {
   layer_init(&center_display_layer, window.layer.frame);
   center_display_layer.update_proc = &center_display_layer_update_callback;
   layer_add_child(&window.layer, &center_display_layer);
-#if DISPLAY_SECONDS
+
   layer_init(&second_display_layer, window.layer.frame);
   second_display_layer.update_proc = &second_display_layer_update_callback;
   layer_add_child(&window.layer, &second_display_layer);
-#endif
 }
 
 void handle_deinit(AppContextRef ctx) {
   (void)ctx;
 
   bmp_deinit_container(&background_image_container);
+#if DISPLAY_DATE
   fonts_unload_custom_font(date_font);
+#endif
 }
 
 void handle_tick(AppContextRef ctx, PebbleTickEvent *t){
@@ -439,10 +385,12 @@ void handle_tick(AppContextRef ctx, PebbleTickEvent *t){
         if(t->tick_time->tm_min%2==0)
         {
            layer_mark_dirty(&hour_display_layer);
+#if DISPLAY_DATE
            if(t->tick_time->tm_min==0&&t->tick_time->tm_hour==0)
            {
               draw_date();
            }
+#endif
 #if HOUR_VIBRATION
            if(t->tick_time->tm_min==0
                  &&t->tick_time->tm_hour>=HOUR_VIBRATION_START
@@ -454,10 +402,7 @@ void handle_tick(AppContextRef ctx, PebbleTickEvent *t){
         }
      }
   }
-
-#if DISPLAY_SECONDS
   layer_mark_dirty(&second_display_layer);
-#endif
   }
 }
 
@@ -468,11 +413,7 @@ void pbl_main(void *params) {
     .timer_handler = &handle_timer,
     .tick_info = {
 			.tick_handler = &handle_tick,
-#if DISPLAY_SECONDS
 			.tick_units = SECOND_UNIT
-#else 
-			.tick_units = MINUTE_UNIT
-#endif
 		}
   };
   app_event_loop(params, &handlers);

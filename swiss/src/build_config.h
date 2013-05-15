@@ -1,4 +1,4 @@
-#define DISPLAY_SECONDS true
+#define DISPLAY_DATE true
 #define HOUR_VIBRATION true
-#define LANG 103
+#define LANG 41
 #define INVERTED false

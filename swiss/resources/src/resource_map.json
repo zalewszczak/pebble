@@ -1,0 +1,28 @@
+{
+    "friendlyVersion": "dev_0.0",
+    "versionDefName": "APP_RESOURCES",
+
+    "media": [
+    {
+      "type":"png",
+      "defName":"IMAGE_BACKGROUND",
+      "file":"images/swiss_background.png"
+    },
+    {
+      "type":"png",
+      "defName":"IMAGE_BACKGROUND_INVERTED",
+      "file":"images/swiss_background_inverted.png"
+    },
+    {
+      "type":"png",
+      "defName":"IMAGE_MENU_ICON",
+      "file":"images/swiss_logo.png"
+    },
+    {
+       "type": "font",
+       "defName": "FONT_ORBITRON_HEAVY_18",
+       "characterRegex": "[0-9. A-Z]",
+       "file": "fonts/orbitron-black.otf"
+    }
+    ]
+}
