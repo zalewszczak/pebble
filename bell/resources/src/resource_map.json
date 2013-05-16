@@ -5,7 +5,12 @@
 	   {
       "type":"png",
       "defName":"IMAGE_BACKGROUND",
-      "file":"images/bell_background.png"
+      "file":"images/bell_background_new.png"
+    },
+    {
+      "type":"png",
+      "defName":"IMAGE_BACKGROUND_INVERTED",
+      "file":"images/bell_background_new_inverted.png"
     },
     {
       "type":"png",
