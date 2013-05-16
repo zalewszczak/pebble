@@ -23,6 +23,7 @@ Layer center_display_layer;
 Layer second_display_layer;
 #if DISPLAY_DATE
 TextLayer date_layer;
+TextLayer logo_layer;
 GFont date_font;
 static char date_text[] = "ABCD. 12";
 #endif
@@ -114,7 +115,7 @@ void second_display_layer_update_callback(Layer *me, GContext* ctx) {
   {
      counter_second_angle -= 0xffff/2;
   }
-  int second_hand_length = 54;
+  int second_hand_length = 50;
   int counter_second_hand_length = 18;
   int circle_radius = 7;
   GPoint center = grect_center_point(&me->frame);
@@ -304,7 +305,7 @@ void draw_date(){
 void handle_init(AppContextRef ctx) {
   (void)ctx;
 
-  window_init(&window, "Roman Watch");
+  window_init(&window, "Swiss Watch");
   window_stack_push(&window, true /* Animated */);
   resource_init_current_app(&APP_RESOURCES);
 
@@ -331,6 +332,21 @@ void handle_init(AppContextRef ctx) {
   layer_add_child(&window.layer, &date_layer.layer);
 
   draw_date();
+
+  text_layer_init(&logo_layer, GRect(17, 30, 110, 30));
+#endif
+#if DISPLAY_DATE && INVERTED
+  text_layer_set_text_color(&logo_layer, GColorBlack);
+#elif DISPLAY_DATE
+  text_layer_set_text_color(&logo_layer, GColorWhite);
+#endif
+#if DISPLAY_DATE
+  text_layer_set_text_alignment(&logo_layer, GTextAlignmentCenter);
+  text_layer_set_background_color(&logo_layer, GColorClear);
+  text_layer_set_font(&logo_layer, date_font);
+  layer_add_child(&window.layer, &logo_layer.layer);
+
+  text_layer_set_text(&logo_layer, "PEBBLE");
 #endif
 
   layer_init(&hour_display_layer, window.layer.frame);
